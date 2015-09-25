@@ -1,0 +1,20 @@
+{
+  "name": "neighborhoods",
+  "version": "1.0.0",
+  "authors": [
+    "justingreco <justin.greco@raleighnc.gov>"
+  ],
+  "description": "Map displaying registered neighborhoods in the City of Raleigh.",
+  "license": "MIT",
+  "dependencies": {
+    "jQuery": "1.11",
+    "leaflet": "~0.7.3",
+    "esri-leaflet": "~1.0.0",
+    "bootstrap": "~3.3.5",
+    "json3": "~3.3.2",
+    "esri-leaflet-geocoder": "~1.0.2",
+    "turf": "~2.0.2",
+    "leaflet-pip": "~0.1.0",
+    "bootstrap-switch": "~3.3.2"
+  }
+}

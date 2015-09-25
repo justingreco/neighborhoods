@@ -1,0 +1,100 @@
+.navbar {
+	margin: 0;
+}
+
+h1 {
+	font-size: 20pt !important;
+	margin-top: 0px;
+	margin-bottom: 5px;
+}
+
+.jumbotron {
+    background-color: #5c8fea !important;
+    color: white !important;
+    background: #537ac1;
+    background-color: #5c8fea;
+    background-position: 30% 50%;
+    background: url(../img/Skyline1.png) bottom no-repeat;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    margin-bottom: 0;
+}
+
+#map {
+	position: absolute;
+	top: 190px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+.geocoder-control-input {
+	height: 40px;
+}
+
+.geocoder-control {
+	left: 50px;
+    top: -60px;
+}
+
+.geocoder-control-suggestions {
+	top: 40px;
+}
+
+.hood-label {
+	color: black;
+	font-size: 8pt;
+	font-weight: bold;
+  text-shadow: 1px 1px #fff, 1px -1px #fff, -1px 1px #fff, -1px -1px #fff;
+  text-shadow: 1px 1px rgba(255,255,255,0.6), 1px -1px rgba(255,255,255,0.6), -1px 1px rgba(255,255,255,0.6), -1px -1px rgba(255,255,255,0.6);	
+}
+
+.cac-label {
+	color: black;
+	font-size: 16pt;
+	font-weight: bold;
+	  text-shadow: 1px 1px #fff, 1px -1px #fff, -1px 1px #fff, -1px -1px #fff;
+  text-shadow: 1px 1px rgba(255,255,255,0.6), 1px -1px rgba(255,255,255,0.6), -1px 1px rgba(255,255,255,0.6), -1px -1px rgba(255,255,255,0.6);
+}
+
+.leaflet-popup .glyphicon{
+	margin-right: 4px;
+	font-size: 12pt;
+	color: #666;
+}
+.leaflet-popup hr{
+	margin-bottom: 10px;
+	margin-top: 10px;
+}
+.popup-title a {
+	margin-right: 5px;
+}
+
+  #basemaps-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    background: white;
+    padding: 10px;
+  }
+
+.layer-title{
+  	font-size: 12pt;
+  }
+  #basemaps {
+    margin-bottom: 5px;
+  }
+
+  @media (max-width: 650px) { 
+	  #basemaps-wrapper {
+	    bottom: 20px;
+	    top: auto;
+	  }
+	  #map {
+	  	top: 52px;
+	  }
+	  .jumbotron {
+	  	display: none;
+	  }
+}

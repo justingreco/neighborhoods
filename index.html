@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Raleigh Neighborhood Registry</title>
+		<meta name="description" content>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="vendor/components/bootstrap/dist/css/bootstrap.css">
+		<link rel="stylesheet" href="vendor/components/leaflet/dist/leaflet.css">
+		<link rel="stylesheet" href="vendor/components/esri-leaflet-geocoder/dist/esri-leaflet-geocoder.css">
+		<link rel="stylesheet" href="vendor/components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css">		
+		<link rel="stylesheet" href="css/main.css">
+
+	</head>
+	<body>
+		<nav class="navbar navbar-default">
+		  <div class="container-fluid">
+		    <!-- Brand and toggle get grouped for better mobile display -->
+		    <div class="navbar-header">
+		      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse" aria-expanded="false">
+		        <span class="sr-only">Toggle navigation</span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		        <span class="icon-bar"></span>
+		      </button>
+		      <a class="navbar-brand" href="#">City of Raleigh</a>
+		    </div>
+		    <!-- Collect the nav links, forms, and other content for toggling -->
+		    <div class="collapse navbar-collapse" id="navbar-collapse">
+		      <ul class="nav navbar-nav navbar-right">
+		        <li><a href="#">About</a></li>
+		        <li><a href="#">Contact</a></li>
+		      </ul>
+		    </div><!-- /.navbar-collapse -->
+		  </div><!-- /.container-fluid -->
+		</nav>	
+		<div class="jumbotron">
+		  <div class="container">
+		  	<div class="pull-left">
+		    	<h1>Neighborhood Registry</h1>
+		    	<span>View registered neighborhoods in Raleigh.</span>
+		    </div>
+		    <img class="pull-right" src="img/City-Seal-white.png" alt="City seal"/>
+		  </div>
+		</div>
+		<div id="map">		<div id="basemaps-wrapper" class="leaflet-bar">
+		  <select class="form-control" name="basemaps" id="basemaps">
+		    <option value="Streets">Streets<options>
+		    <option value="Imagery">Imagery</option>
+		  </select>
+		  <input type="checkbox" name="cac-checkbox" checked> <span class="layer-title"> Citizen Advisory Council</span>
+		  <br/><br/>
+		  <input type="checkbox" name="hood-checkbox" checked> <span class="layer-title"> Neighborhoods</span>
+		</div></div>
+		
+		<script src="vendor/components/jQuery/dist/jquery.min.js"></script>
+		<script src="vendor/components/leaflet/dist/leaflet.js"></script>
+		<script src="vendor/components/esri-leaflet/dist/esri-leaflet.js"></script>
+		<script src="vendor/components/esri-leaflet-geocoder/dist/esri-leaflet-geocoder.js"></script>
+		<script src="vendor/components/turf/turf.min.js"></script>		
+		<script src="vendor/components/leaflet-pip/leaflet-pip.js"></script>		
+		<script src="vendor/components/bootstrap-switch/dist/js/bootstrap-switch.min.js"></script>	
+		<script src="js/main.js"></script>
+	</body>
+</html>
