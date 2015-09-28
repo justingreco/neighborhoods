@@ -414,6 +414,7 @@ var initMap = function () {
   		map.removeLayer(hoodLabels);
   		cacLoadCnt = 0;
  		addCacs(map);
+ 		map.addLayer(hoodLabels);
   	} else {
   		map.removeLayer(cacs);
   		map.removeLayer(cacLabels);
