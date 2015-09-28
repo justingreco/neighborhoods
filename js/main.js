@@ -99,7 +99,7 @@ $(document).ready(function () {
   };
   var addGeocoder = function (map) {
     var flProvider = new L.esri.Geocoding.Controls.Geosearch.Providers.FeatureLayer({
-      url: 'http://giststapplv1:6080/arcgis/rest/services/Planning/Subdivisions/MapServer/1/',
+      url: 'https://maps.raleighnc.gov/arcgis/rest/services/Planning/Subdivisions/MapServer/1/',
       searchFields: ['NAME'],
       label: 'Neighborhoods',
       formatSuggestion: function(feature){
@@ -107,7 +107,7 @@ $(document).ready(function () {
       }
     });
     var flProvider2 = new L.esri.Geocoding.Controls.Geosearch.Providers.FeatureLayer({
-      url: 'http://giststapplv1:6080/arcgis/rest/services/Addresses/MapServer/0/',
+      url: 'https://maps.raleighnc.gov/arcgis/rest/services/Addresses/MapServer/0/',
       searchFields: ['ADDRESS'],
       label: 'Address',
       formatSuggestion: function(feature){
@@ -317,7 +317,7 @@ var hoodClicked = function (e) {
 
 var addHoods = function (map) {
   hoods = L.esri.featureLayer({
-    url: 'http://giststapplv1:6080/arcgis/rest/services/Planning/Subdivisions/MapServer/1',
+    url: 'https://maps.raleighnc.gov/arcgis/rest/services/Planning/Subdivisions/MapServer/1',
     simplifyFactor: 0.35,
     precision: 5,
     style: function (feature) {
