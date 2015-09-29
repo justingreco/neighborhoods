@@ -1,4 +1,4 @@
-$(document).ready(function () {
+{{$(document).ready(function () {
   var cacs, hoods, cacLabels, hoodLabels, popupFeatures, popupId;
   var streets, imagery, labels, lots;
   var map;
@@ -70,7 +70,6 @@ $(document).ready(function () {
     specialists = json;
     initMap();
   });
-  
   var getNeighborhoodDetails = function (feature) {
     var matches = $(specialists).filter(function (i) { return this.code === feature.properties.CAC;});
     if (matches.length > 0) {
@@ -92,7 +91,7 @@ $(document).ready(function () {
           [bounds.getNorthWest().lng, bounds.getNorthWest().lat],
           [bounds.getNorthEast().lng, bounds.getNorthEast().lat],
           [bounds.getSouthEast().lng, bounds.getSouthEast().lat],
-          [bounds.getSouthWest().lng, bounds.getSouthWest().lat]	            
+          [bounds.getSouthWest().lng, bounds.getSouthWest().lat]
         ]]
       }
     }
@@ -113,16 +112,12 @@ $(document).ready(function () {
       formatSuggestion: function(feature){
         return feature.properties.ADDRESS;
       }
-    });  
+    });
     var searchControl = L.esri.Geocoding.Controls.geosearch({expanded: true, collapseAfterResult: false, placeholder: 'Search By Address or Neighborhood', useMapBounds: false}).addTo(map);
     searchControl.options.providers = [];
     searchControl.options.providers.push(flProvider);
     searchControl.options.providers.push(flProvider2);
     searchControl.on('results', function (data) {
-      // results.clearLayers();
-      // hoods.query().contains(data.latlng).run(function (error, featureCollection) {
-      // 	console.log(featureCollection);
-      // });
       hoods.eachFeature(function (feature, layer) {
         try {
           if (turf.intersect(feature.toGeoJSON(), {
@@ -135,14 +130,12 @@ $(document).ready(function () {
           }) != undefined) {
             feature.openPopup();
             map.fitBounds(feature.getBounds());
+            highlightPopup(feature.feature.id);
           }} catch (err) {
-            console.log(feature.feature.properties.NAME);
           }
-          
         });
       });
     };
-    
     var setCacStyle = function (fill) {
       cacs.setStyle(function (feature) {
         var color = getCacColor(feature.properties.NAME);
@@ -157,8 +150,17 @@ $(document).ready(function () {
       }
     );
   };
-  
   var highlightPopup = function (id) {
+    hoods.setStyle(function () {
+      return {
+        weight: 3,
+        opacity: 1,
+        color: '#777',
+        fillColor: '#777',
+        fillOpacity: 0.5,
+        clickable: true
+      }
+    });
     hoods.setFeatureStyle(id, function (feature) {
       return {
         weight: 3,
@@ -171,23 +173,20 @@ $(document).ready(function () {
     }
   );
 };
-
 var drawLabel = function (simplified, bounds, name) {
   var intersect = turf.intersect(simplified, bounds);
-  
   if (intersect) {
     var center = turf.centroid(intersect);//feature.getBounds().getCenter();
     var label = L.marker([center.geometry.coordinates[1], center.geometry.coordinates[0]], {
       icon: L.divIcon({
         iconSize: null,
         className: 'cac-label',
-        iconAnchor: [40, 20],  			
+        iconAnchor: [40, 20],
         html: '<div>' + name + '</div>'
       })
-    }).addTo(cacLabels);			
-  }	
+    }).addTo(cacLabels);
+  }
 };
-
 var labelCacs = function (bounds, map) {
   cacLabels.clearLayers();
   cacs.eachFeature(function (f) {
@@ -195,25 +194,20 @@ var labelCacs = function (bounds, map) {
       var feat, simplified;
       if (f.feature.geometry.type === 'MultiPolygon') {
         $.each(f.feature.geometry.coordinates, function (i, coords) {
-          
           feat = {'type': 'Feature', 'properties':{}, 'geometry': {'type': 'Polygon', 'coordinates': coords}};
-          
-          simplified = turf.simplify(feat, 0.001, false);
-          drawLabel(simplified, bounds, f.feature.properties.NAME );
-          
-        });	      			
+          if (map.getZoom() > 14 || turf.area(feat) > 10000000) {
+            simplified = turf.simplify(feat, 0.001, false);
+            drawLabel(simplified, bounds, f.feature.properties.NAME );
+          }
+        });
       } else {
         simplified = turf.simplify(f.feature, 0.001, false);
         drawLabel(simplified, bounds, f.feature.properties.NAME );
       }
-      
-      
-      
     } catch (err){
-      console.log(err);
     }
   });
-}; 
+};
 var labelHoods = function (bounds, map) {
   hoods.query().intersects(map.getBounds()).run(function (error, featureCollection) {
     for (var i = 0; i < featureCollection.features.length; i++) {
@@ -229,16 +223,13 @@ var labelHoods = function (bounds, map) {
               iconAnchor: [20, 20],
               html: '<div>' + f.properties.NAME + '</div>'
             })
-          }).addTo(hoodLabels); 				
+          }).addTo(hoodLabels);
         }
       } catch (err){
-        console.log(f.properties.NAME);
-      }  	
+      }
     }
-    
   });
-  
-};	  
+};
 var cacLoadCnt = 0;
 var addCacs = function (map) {
   cacs = L.esri.featureLayer({
@@ -246,26 +237,23 @@ var addCacs = function (map) {
     simplifyFactor: 0.35,
     precision: 5
   }).addTo(map);
-  
   setCacStyle(true);
   cacs.on('load', function (e) {
     labelCacs(boundsToGeojson(map.getBounds()), map);
     if (cacLoadCnt === 0) {
       if ($("[name='hood-checkbox']").prop('checked')){
-         addHoods(map);
-       }
+        addHoods(map);
+      }
     }
     cacLoadCnt += 1;
   });
 };
-
 var toggleLinkClicked = function () {
   if (this.text === 'Next') {
     popupId += 1;
     if (popupId >= popupFeatures.length) {
       popupId = 0;
     }
-    
   } else {
     popupId -= 1;
     if (popupId < 0) {
@@ -273,23 +261,10 @@ var toggleLinkClicked = function () {
     }
   }
   var f = popupFeatures[popupId];
-  console.log(f);
   $(".leaflet-popup-content").html(popupFeatures[popupId]._popup.getContent());
   $('.toggle-links a').on('click', toggleLinkClicked);
-  hoods.setStyle(function () {
-    return {
-      weight: 3,
-      opacity: 1,
-      color: '#777',
-      fillColor: '#777',
-      fillOpacity: 0.5,
-      clickable: true
-    }
-  });
   highlightPopup(f.feature.id);
-  
 };
-
 var hoodClicked = function (e) {
   var polys = leafletPip.pointInLayer(e.latlng, hoods);
   if (polys.length > 1) {
@@ -297,7 +272,7 @@ var hoodClicked = function (e) {
     popupFeatures = polys;
     popupId = 0;
     $(".leaflet-popup-content").html(popupFeatures[0]._popup.getContent());
-    $('.toggle-links a').on('click', toggleLinkClicked); 		
+    $('.toggle-links a').on('click', toggleLinkClicked);
   } else {
     $('.toggle-links').hide();
   }
@@ -312,9 +287,7 @@ var hoodClicked = function (e) {
     }
   });
   highlightPopup(polys[0].feature.id);
-  
 };
-
 var addHoods = function (map) {
   hoods = L.esri.featureLayer({
     url: 'https://maps.raleighnc.gov/arcgis/rest/services/Planning/Subdivisions/MapServer/1',
@@ -331,75 +304,64 @@ var addHoods = function (map) {
       }
     }, onEachFeature: function (feature, layer) {
       feature = getNeighborhoodDetails(feature);
-      layer.bindPopup(L.Util.template("<div><div class='popup-title'><strong class='popup-name lead'>{NAME}</strong></div><hr/><span class='glyphicon glyphicon-map-marker'></span><strong>CAC:</strong> {CAC}<br/><span class='glyphicon glyphicon-user'></span><strong>Specialist:</strong> {SPECIALIST}<br/><span class='glyphicon glyphicon-envelope'></span><strong>Email:</strong> <a href='mailto:{EMAIL}'>{EMAIL}</a><br/><span class='glyphicon glyphicon-phone'></span><strong>Phone:</strong> {PHONE}<br/><span class='glyphicon glyphicon-home'></span><strong>Homes:</strong> {HOMES}</div><form action='php/export.php' method='post'  style='display:none'><input name='columns' style='display:none'/><input name='csv' style='display:none'/></form><a class='mail-list' data-id='" + feature.id + "' href='javascript:void(0)'>Mailing List</a><div class='toggle-links'><a href='javascript:void(0)'>Previous</a><a href='javascript:void(0)'>Next</a></div>", feature.properties));
+      layer.bindPopup(L.Util.template("<div><div class='popup-title'><strong class='popup-name lead'>{NAME}</strong></div><hr/><span class='glyphicon glyphicon-map-marker'></span><strong>CAC:</strong> {CAC}<br/><span class='glyphicon glyphicon-user'></span><strong>Specialist:</strong> {SPECIALIST}<br/><span class='glyphicon glyphicon-envelope'></span><strong>Email:</strong> <a href='mailto:{EMAIL}'>{EMAIL}</a><br/><span class='glyphicon glyphicon-phone'></span><strong>Phone:</strong> {PHONE}<br/><span class='glyphicon glyphicon-home'></span><strong>Homes:</strong> {HOMES}</div><form action='php/export.php' method='post'  style='display:none'><input name='columns' style='display:none'/><input name='csv' style='display:none'/></form><br/><a class='mail-list' data-id='" + feature.id + "' href='javascript:void(0)'><span class='glyphicon glyphicon-floppy-save'></span> Mailing List</a><br/><br/><div class='toggle-links'><a href='javascript:void(0)'>&lt; Previous</a><a href='javascript:void(0)'>Next &gt;</a></div>", feature.properties));
     }
   }).addTo(map).on('click', hoodClicked);
-  
 };
-
 var createMailList = function (features) {
-	var list = [];
-	$.each(features, function (i, feature) {
-		var item = [];
-		item.push("Resident");
-		item.push(feature.properties.ADDRESS);
-		item.push(feature.properties.CITY);
-		item.push(feature.properties.STATE);
-		item.push(feature.properties.ZIP);
-		list.push(item);								
-	});
-	$('form>input[name="columns"]', '.leaflet-popup-content').attr("value", JSON.stringify(['PERSON','ADDRESS','CITY','STATE','ZIP']));
-	$('form>input[name="csv"]', '.leaflet-popup-content').attr("value", JSON.stringify(list));
-	$('form', '.leaflet-popup-content').submit();	
+  var list = [];
+  $.each(features, function (i, feature) {
+    var item = [];
+    item.push("Resident");
+    item.push(feature.properties.ADDRESS);
+    item.push(feature.properties.CITY);
+    item.push(feature.properties.STATE);
+    item.push(feature.properties.ZIP);
+    list.push(item);
+  });
+  $('form>input[name="columns"]', '.leaflet-popup-content').attr("value", JSON.stringify(['PERSON','ADDRESS','CITY','STATE','ZIP']));
+  $('form>input[name="csv"]', '.leaflet-popup-content').attr("value", JSON.stringify(list));
+  $('form', '.leaflet-popup-content').submit();
 };
-
 var initMap = function () {
   map = L.map('map').setView([35.85, -78.65], 11);
   streets = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-  }).addTo(map);  
+  }).addTo(map);
   imagery = L.esri.basemapLayer('Imagery');
-
   $('#basemaps').change(function (e) {
-  	if ($(this).val() === 'Streets') {
-  		map.removeLayer(imagery);
-  		map.removeLayer(labels);
-  		map.addLayer(streets);
-  		lots.setOpacity(0.25);
-  	} else {
-  		map.removeLayer(streets);
-  		map.addLayer(imagery);
-  		labels = L.esri.basemapLayer('ImageryLabels');
-  		map.addLayer(labels);
-  		lots.setOpacity(1);
-  	}
+    if ($(this).val() === 'Streets') {
+      map.removeLayer(imagery);
+      map.removeLayer(labels);
+      map.addLayer(streets);
+      lots.setOpacity(0.25);
+    } else {
+      map.removeLayer(streets);
+      map.addLayer(imagery);
+      labels = L.esri.basemapLayer('ImageryLabels');
+      map.addLayer(labels);
+      lots.setOpacity(1);
+    }
   });
-
   addGeocoder(map);
   addCacs(map);
   map.on('popupopen', function (e){
-    console.log(e);
     $(e.popup.getContent, '.mail-list').off();
     $(e.popup.getContent, '.mail-list').click(function (e) {
       var id = $(e.target).data('id');
       var feature = hoods.getFeature(id);
       L.esri.Tasks.query({
-      	url: 'https://maps.raleighnc.gov/arcgis/rest/services/Addresses/MapServer/0'
+        url: 'https://maps.raleighnc.gov/arcgis/rest/services/Addresses/MapServer/0'
       }).within(feature.feature.geometry).run(function (error, featureCollection) {
-      	console.log(featureCollection);
-      	createMailList(featureCollection.features);
+        createMailList(featureCollection.features);
       });
     });
-    
   });
-  
-  
   hoodLabels = L.featureGroup().addTo(map);
   cacLabels = L.featureGroup().addTo(map);
   map.on('zoomend', function (e) {
     setCacStyle(map.getZoom() < 14);
   });
-  
   map.on('moveend', function (e) {
     hoodLabels.clearLayers();
     if (map.getZoom() > 13) {
@@ -407,47 +369,49 @@ var initMap = function () {
     }
     labelCacs(boundsToGeojson(map.getBounds()), map);
   });
-
   $("[name='cac-checkbox']").bootstrapSwitch({onSwitchChange: function (e, state) {
-  	if (state) {
-  		map.removeLayer(hoods);
-  		map.removeLayer(hoodLabels);
-  		cacLoadCnt = 0;
- 		addCacs(map);
- 		map.addLayer(hoodLabels);
-  	} else {
-  		map.removeLayer(cacs);
-  		map.removeLayer(cacLabels);
-  	}
+    if (state) {
+      map.removeLayer(hoods);
+      map.removeLayer(hoodLabels);
+      cacLoadCnt = 0;
+      addCacs(map);
+      if ($("[name='hood-checkbox']").prop('checked')) {
+        map.addLayer(hoodLabels);
+      }
+    } else {
+      map.removeLayer(cacs);
+      map.removeLayer(cacLabels);
+    }
   }});
   $("[name='hood-checkbox']").bootstrapSwitch({onSwitchChange: function (e, state) {
-  	if (state) {
-  		map.addLayer(hoods);
-  		map.addLayer(hoodLabels);
-
-  	} else {
-  		map.removeLayer(hoods);
-  		map.removeLayer(hoodLabels);
-  	}  	
+    if (state) {
+      map.addLayer(hoods);
+      map.addLayer(hoodLabels);
+    } else {
+      map.removeLayer(hoods);
+      map.removeLayer(hoodLabels);
+    }
   }});
-  
   var results = L.layerGroup().addTo(map);
-  
   lots = L.esri.dynamicMapLayer({
     url: 'https://maps.raleighnc.gov/arcgis/rest/services/Parcels/MapServer',
     opacity: 0.25,
     position: 'back'
-  }).addTo(map); 
+  }).addTo(map);
+  if (window.innerWidth <= 650) {
+    $('.navbar-brand').html('Neighborhood Registry');
+  } else {
+    $('.navbar-brand').html('City of Raleigh');
+  }  
 }
-	window.setTimeout(function () {
-			$(".geocoder-control-input").prop('placeholder', 'Search By Address or Neighborhood');
-
-		}, 100);
-	$(window).resize(function () {
-		if (window.innerWidth <= 650) {
-			$('.navbar-brand').html('Neighborhood Registry');
-		} else {
-			$('.navbar-brand').html('City of Raleigh');
-		}
-	});
+window.setTimeout(function () {
+  $(".geocoder-control-input").prop('placeholder', 'Search By Address or Neighborhood');
+}, 100);
+$(window).resize(function () {
+  if (window.innerWidth <= 650) {
+    $('.navbar-brand').html('Neighborhood Registry');
+  } else {
+    $('.navbar-brand').html('City of Raleigh');
+  }
 });
+});}}

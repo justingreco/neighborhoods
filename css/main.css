@@ -1,13 +1,11 @@
 .navbar {
 	margin: 0;
 }
-
 h1 {
 	font-size: 20pt !important;
 	margin-top: 0px;
 	margin-bottom: 5px;
 }
-
 .jumbotron {
     background-color: #5c8fea !important;
     color: white !important;
@@ -19,7 +17,6 @@ h1 {
     padding-bottom: 30px;
     margin-bottom: 0;
 }
-
 #map {
 	position: absolute;
 	top: 190px;
@@ -27,40 +24,38 @@ h1 {
 	left: 0;
 	right: 0;
 }
-
 .geocoder-control-input {
 	height: 40px;
 }
-
 .geocoder-control {
 	left: 50px;
     top: -60px;
 }
-
 .geocoder-control-suggestions {
 	top: 40px;
 }
-
 .hood-label {
 	color: black;
 	font-size: 8pt;
 	font-weight: bold;
   text-shadow: 1px 1px #fff, 1px -1px #fff, -1px 1px #fff, -1px -1px #fff;
-  text-shadow: 1px 1px rgba(255,255,255,0.6), 1px -1px rgba(255,255,255,0.6), -1px 1px rgba(255,255,255,0.6), -1px -1px rgba(255,255,255,0.6);	
+  text-shadow: 1px 1px rgba(255,255,255,0.6), 1px -1px rgba(255,255,255,0.6), -1px 1px rgba(255,255,255,0.6), -1px -1px rgba(255,255,255,0.6);
 }
-
 .cac-label {
 	color: black;
-	font-size: 16pt;
+	font-size: 12pt;
 	font-weight: bold;
 	  text-shadow: 1px 1px #fff, 1px -1px #fff, -1px 1px #fff, -1px -1px #fff;
   text-shadow: 1px 1px rgba(255,255,255,0.6), 1px -1px rgba(255,255,255,0.6), -1px 1px rgba(255,255,255,0.6), -1px -1px rgba(255,255,255,0.6);
 }
-
-.leaflet-popup .glyphicon{
-	margin-right: 4px;
-	font-size: 12pt;
+.leaflet-popup .glyphicon : not(a){
 	color: #666;
+}
+.leaflet-popup .glyphicon{
+	margin-right: 0.5em;
+	margin-bottom: 0.25em;
+	font-size: 16pt;
+	vertical-align: middle;
 }
 .leaflet-popup hr{
 	margin-bottom: 10px;
@@ -69,7 +64,6 @@ h1 {
 .popup-title a {
 	margin-right: 5px;
 }
-
   #basemaps-wrapper {
     position: absolute;
     top: 10px;
@@ -78,15 +72,16 @@ h1 {
     background: white;
     padding: 10px;
   }
-
 .layer-title{
   	font-size: 12pt;
   }
   #basemaps {
     margin-bottom: 5px;
   }
-
-  @media (max-width: 650px) { 
+  .toggle-links a {
+  	margin-right: 10px;
+  }
+  @media (max-width: 650px) {
 	  #basemaps-wrapper {
 	    bottom: 20px;
 	    top: auto;
