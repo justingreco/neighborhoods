@@ -1,7 +1,123 @@
 {{$(document).ready(function () {
-  var cacs, hoods, cacLabels, hoodLabels, popupFeatures, popupId;
+  var cacs, hoods, cacLabels, hoodLabels, popupFeatures, popupId, marker;
   var streets, imagery, labels, lots;
   var map;
+
+
+
+  var printMap = function () {
+    var scales = [
+    {
+      level: 11,
+      scale: 288895.277144
+    },{
+      level: 12,
+      scale: 144447.638572
+    },{
+      level: 13,
+      scale: 72223.819286
+    },{
+      level: 14,
+      scale: 36111.909643
+    },{
+      level: 15,
+      scale: 18055.954822
+    },{
+      level: 16,
+      scale: 9027.977411
+    },{
+      level: 17,
+      scale: 4513.9887055
+    },{
+      level: 18,
+      scale: 2256.99435275
+    }];
+
+    var scale = $(scales).filter(function (i) {
+      return this.scale === map.getZoom();
+    });
+
+    if (scale.length > 0) {
+      scale = scale[0];
+    }
+
+    var webmapJson = {
+     "mapOptions": {
+     "extent" : {
+      "xmin" : map.getBounds().getWest(),
+      "ymin" : map.getBounds().getSouth(),
+      "xmax" : map.getBounds().getEast(),
+      "ymax" : map.getBounds().getNorth(),
+      "spatialReference" : {
+        wkid: 4326
+       }
+     },
+     "scale": scale,
+     "rotation": 0,
+     "spatialReference": {
+      wkid: 4326
+     }
+   },
+     "operationalLayers": [{
+      "url" : "https://maps.raleighnc.gov/arcgis/rest/services/Parcels/MapServer",
+      "title" : "Parcels",
+      "opacity" : 0.5,
+      "visibleLayers" : [
+       0,
+       1
+      ]
+     },{
+      "url" : "https://maps.raleighnc.gov/arcgis/rest/services/Planning/Subdivisions/MapServer",
+      "title" : "Neighborhoods",
+      "opacity" : 1,
+      "visibleLayers" : [
+       1
+      ]
+     }
+    ],
+      "baseMap" : {
+       "title" : "CartoDB Proton",
+       "baseMapLayers" :  [
+        {
+         "type" : "WebTiledLayer",
+         "urlTemplate" : "http://{subDomain}.basemaps.cartocdn.com/light_all/{level}/{col}/{row}.png",
+         "subDomains" : [
+           "a", 
+           "b", 
+           "c", 
+           "d"
+         ]
+        }
+       ]
+      },
+     "exportOptions": {},
+     "layoutOptions": {
+      "titleText": "City of Raleigh Neighborhood Registry"
+     }
+    };
+    $.ajax({
+      url: 'http://maps.raleighnc.gov/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task/execute',
+      type: 'POST',
+      dataType: 'json',
+      data: {'Web_Map_as_JSON': JSON.stringify(webmapJson),
+              'Format': 'PDF',
+              'Layout_Template': 'Letter ANSI A Landscape',
+              'Output_File': 'test.pdf',
+              'f': 'json'
+    },
+    })
+    .done(function(data) {
+      console.log("success");
+      window.open(data.results[0].value.url);
+    })
+    .fail(function() {
+      console.log("error");
+    })
+    .always(function() {
+      console.log("complete");
+    });
+    
+  };
   var getCacColor = function (name) {
     var color = "#000";
     switch (name) {
@@ -119,6 +235,8 @@
     searchControl.options.providers.push(flProvider2);
     searchControl.on('results', function (data) {
       hoods.eachFeature(function (feature, layer) {
+        marker.clearLayers();
+        marker.addLayer(L.marker(data.latlng));
         try {
           if (turf.intersect(feature.toGeoJSON(), {
             "type": "Feature",
@@ -144,7 +262,7 @@
           opacity: 1,
           color: color,
           fillColor: color,
-          fillOpacity: (fill) ? 0.5 : 0,
+          fillOpacity: (fill) ? 0.25 : 0,
           clickable: true
         }
       }
@@ -240,10 +358,13 @@ var addCacs = function (map) {
   setCacStyle(true);
   cacs.on('load', function (e) {
     labelCacs(boundsToGeojson(map.getBounds()), map);
+
     if (cacLoadCnt === 0) {
-      if ($("[name='hood-checkbox']").prop('checked')){
-        addHoods(map);
-      }
+      //if ($("[name='hood-checkbox']").prop('checked')){
+        window.setTimeout(function() {
+          addHoods(map);
+        }, 500);
+      //}
     }
     cacLoadCnt += 1;
   });
@@ -324,6 +445,7 @@ var createMailList = function (features) {
   $('form', '.leaflet-popup-content').submit();
 };
 var initMap = function () {
+  $("#print").click(printMap);
   map = L.map('map').setView([35.85, -78.65], 11);
   streets = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
@@ -348,17 +470,23 @@ var initMap = function () {
   map.on('popupopen', function (e){
     $(e.popup.getContent, '.mail-list').off();
     $(e.popup.getContent, '.mail-list').click(function (e) {
+      
       var id = $(e.target).data('id');
       var feature = hoods.getFeature(id);
-      L.esri.Tasks.query({
-        url: 'https://maps.raleighnc.gov/arcgis/rest/services/Addresses/MapServer/0'
-      }).within(feature.feature.geometry).run(function (error, featureCollection) {
-        createMailList(featureCollection.features);
-      });
+      if (feature) {
+         L.esri.Tasks.query({
+          url: 'https://maps.raleighnc.gov/arcgis/rest/services/Addresses/MapServer/0'
+        }).within(feature.feature.geometry).run(function (error, featureCollection) {
+          createMailList(featureCollection.features);
+        });       
+      }
+
     });
   });
+  marker = L.featureGroup().addTo(map);
   hoodLabels = L.featureGroup().addTo(map);
   cacLabels = L.featureGroup().addTo(map);
+
   map.on('zoomend', function (e) {
     setCacStyle(map.getZoom() < 14);
   });
@@ -373,11 +501,18 @@ var initMap = function () {
     if (state) {
       map.removeLayer(hoods);
       map.removeLayer(hoodLabels);
-      cacLoadCnt = 0;
-      addCacs(map);
-      if ($("[name='hood-checkbox']").prop('checked')) {
+      //cacLoadCnt = 0;
+      //addCacs(map);
+      //if ($("[name='hood-checkbox']").prop('checked')) {
+        //map.addLayer(hoodLabels);
+      //}
+      map.addLayer(cacs);
+      map.addLayer(cacLabels);
+
+      window.setTimeout(function() {
+        map.addLayer(hoods);
         map.addLayer(hoodLabels);
-      }
+        }, 1000);      
     } else {
       map.removeLayer(cacs);
       map.removeLayer(cacLabels);
@@ -392,7 +527,6 @@ var initMap = function () {
       map.removeLayer(hoodLabels);
     }
   }});
-  var results = L.layerGroup().addTo(map);
   lots = L.esri.dynamicMapLayer({
     url: 'https://maps.raleighnc.gov/arcgis/rest/services/Parcels/MapServer',
     opacity: 0.25,
